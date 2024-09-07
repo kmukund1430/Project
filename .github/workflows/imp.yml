@@ -36,7 +36,7 @@ on:
           - team3@corp.com
           - team4@corp.com
           - team5@corp.com
-          - team6@corp.com
+          - Kmukund97@gmail.com
       manual_steps:
         description: 'Do you have manual steps?'
         required: true
@@ -108,5 +108,5 @@ jobs:
         password: ${{ secrets.SMTP_PASSWORD }}
         subject: "Job Completed"
         body: "Hey, the CI Pipeline job has been completed."
-        to: your-email@example.com
+        to: kmukund97@gmail.com
         from: no-reply@example.com
