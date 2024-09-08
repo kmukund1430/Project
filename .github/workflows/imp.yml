@@ -1,4 +1,4 @@
-name: CI Pipeline 
+name: CI
 
 on:
   push:
@@ -9,52 +9,6 @@ on:
       - main
   repository_dispatch:
     types: [trigger-build]
-  workflow_dispatch:
-    inputs:
-      developer_name:
-        description: 'Developer Name'
-        required: true
-        type: string
-      story_or_defect_number:
-        description: 'Enter the Story or Defect Number'
-        required: true
-        type: string
-      sprint:
-        description: 'Choose the Sprint'
-        required: true
-        type: choice
-        options:
-          - pp2.2
-          - mm3.2
-      team_email:
-        description: 'Choose the Team Email ID'
-        required: true
-        type: choice
-        options:
-          - team1@corp.com
-          - team2@corp.com
-          - team3@corp.com
-          - team4@corp.com
-          - team5@corp.com
-          - Kmukund97@gmail.com
-      manual_steps:
-        description: 'Do you have manual steps?'
-        required: true
-        type: choice
-        options:
-          - yes
-          - no
-      branch_exception:
-        description: 'Choose yes if you have approved Branch exception'
-        required: true
-        type: choice
-        options:
-          - yes
-          - no
-      comments:
-        description: 'Enter your deployment comments'
-        required: false
-        type: string
 
 jobs:
   build:
@@ -68,7 +22,6 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '11'
-        distribution: 'temurin'  # Specify the Java distribution
 
     - name: Install Ant
       run: sudo apt-get update && sudo apt-get install -y ant
@@ -80,7 +33,10 @@ jobs:
       run: ant test
 
     - name: Deploy to L1
-      run: ant deploy-l1
+      run: |
+        echo "Starting deployment to L1..."
+        ant deploy-l1
+        echo "Deployment to L1 completed successfully."
 
   deploy-l3:
     runs-on: ubuntu-latest
@@ -91,7 +47,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Deploy to L3
-      run: ant deploy-l3
+      run: |
+        echo "Starting deployment to L3..."
+        ant deploy-l3
+        echo "Deployment to L3 completed successfully."
 
   notify:
     runs-on: ubuntu-latest
@@ -103,11 +62,11 @@ jobs:
     - name: Send email notification
       uses: dawidd6/action-send-mail@v3
       with:
-        server_address: smtp.example.com
+        server_address: smtp.gmail.com
         server_port: 587
         username: ${{ secrets.SMTP_USERNAME }}
         password: ${{ secrets.SMTP_PASSWORD }}
-        subject: "Job Completed"
-        body: "Hey, the CI Pipeline job has been completed."
+        subject: "CI Pipeline Job Completed"
+        body: "The CI Pipeline job has been completed successfully."
         to: kmukund97@gmail.com
         from: no-reply@example.com
