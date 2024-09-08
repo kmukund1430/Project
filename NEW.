@@ -1,0 +1,172 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  repository_dispatch:
+    types: [trigger-build]
+  workflow_dispatch:
+    inputs:
+      developer_name:
+        description: 'Developer Name'
+        required: true
+        type: string
+      story_or_defect_number:
+        description: 'Enter the Story or Defect Number'
+        required: true
+        type: string
+      sprint:
+        description: 'Choose the Sprint'
+        required: true
+        type: choice
+        options:
+          - pp2.2
+          - mm3.2
+      team_email:
+        description: 'Choose the Team Email ID'
+        required: true
+        type: choice
+        options:
+          - team1@corp.com
+          - team2@corp.com
+          - team3@corp.com
+          - team4@corp.com
+          - team5@corp.com
+          - team6@corp.com
+      manual_steps:
+        description: 'Do you have manual steps?'
+        required: true
+        type: choice
+        options:
+          - yes
+          - no
+      branch_exception:
+        description: 'Choose yes if you have approved Branch exception'
+        required: true
+        type: choice
+        options:
+          - yes
+          - no
+      comments:
+        description: 'Enter your deployment comments'
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+
+    - name: Install Ant
+      run: sudo apt-get update && sudo apt-get install -y ant
+
+    - name: Build
+      run: ant build
+
+    - name: Test
+      run: ant test
+
+    - name: Deploy to L1
+      run: ant deploy-l1
+
+  deploy-l3:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Deploy to L3
+      run: ant deploy-l3
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build, deploy-l3]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Determine email recipients
+      id: determine-recipients
+      run: |
+        echo "TRIGGERING_USER=${{ github.actor }}" >> $GITHUB_ENV
+        EMAILS=$(jq -r --arg user "${{ github.actor }}" '.[$user] | .team + [ .individual ] | join(",")' user_emails.json)
+        echo "EMAILS=$EMAILS" >> $GITHUB_ENV
+
+    - name: Send initial email notification
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.example.com
+        server_port: 587
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: Build Triggered Successfully
+        body: |
+          Hi ${{ github.actor }},
+          We have successfully triggered your build.
+          Developer: ${{ github.event.inputs.developer_name }}
+          Story/Defect Number: ${{ github.event.inputs.story_or_defect_number }}
+          Sprint: ${{ github.event.inputs.sprint }}
+          Manual Steps: ${{ github.event.inputs.manual_steps }}
+          Branch Exception: ${{ github.event.inputs.branch_exception }}
+          Comments: ${{ github.event.inputs.comments }}
+        to: ${{ env.EMAILS }}
+        cc: ${{ github.event.inputs.team_email }}
+        from: no-reply@example.com
+
+    - name: Send email notification on success
+      if: success()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.example.com
+        server_port: 587
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: Build and Deployment Successful
+        body: |
+          Hi ${{ github.actor }},
+          The build and deployment were successful!
+          Developer: ${{ github.event.inputs.developer_name }}
+          Story/Defect Number: ${{ github.event.inputs.story_or_defect_number }}
+          Sprint: ${{ github.event.inputs.sprint }}
+          Manual Steps: ${{ github.event.inputs.manual_steps }}
+          Branch Exception: ${{ github.event.inputs.branch_exception }}
+          Comments: ${{ github.event.inputs.comments }}
+        to: ${{ env.EMAILS }}
+        cc: ${{ github.event.inputs.team_email }}
+        from: no-reply@example.com
+
+    - name: Send email notification on failure
+      if: failure()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.example.com
+        server_port: 587
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: Build Failed
+        body: |
+          Hi ${{ github.actor }},
+          The build failed due to the following error(s). Please check the logs for details.
+          Developer: ${{ github.event.inputs.developer_name }}
+          Story/Defect Number: ${{ github.event.inputs.story_or_defect_number }}
+          Sprint: ${{ github.event.inputs.sprint }}
+          Manual Steps: ${{ github.event.inputs.manual_steps }}
+          Branch Exception: ${{ github.event.inputs.branch_exception }}
+          Comments: ${{ github.event.inputs.comments }}
+        to: ${{ env.EMAILS }}
+        cc: ${{ github.event.inputs.team_email }}
+        from: no-reply@example.com
