@@ -23,7 +23,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '11'
-        distribution: 'temurin'  # Add the distribution inpu
+        distribution: 'temurin'  # Add the distribution input
 
     - name: Build
       run: |
