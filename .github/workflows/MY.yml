@@ -89,4 +89,3 @@ jobs:
           to: hari.narayan.k158@gmail.com
           from: ${{ secrets.EMAIL_USERNAME }}  # Add the sender's email here
           attachments: test.txt
-         attachments: test.txt
