@@ -1,0 +1,67 @@
+name: Test All Events
+
+on:
+  # Trigger on any push to the repository
+  push:
+    branches:
+      - main
+  # Trigger on pull request creation or update
+  pull_request:
+    branches:
+      - main
+  # Trigger on issue events like opened, closed, reopened, or labeled
+  issues:
+    types: [opened, closed, reopened, labeled]
+  # Trigger when a new release is published
+  release:
+    types: [published]
+  # Trigger on schedule (every day at 00:00 UTC)
+  schedule:
+    - cron: "0 0 * * *"
+  # Manual trigger via GitHub UI
+  workflow_dispatch:
+
+jobs:
+  test-all-events:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Display GitHub Event Information
+        run: |
+          echo "Event Name: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event Path: ${{ github.event_path }}"
+      
+      - name: Check if it's a push or pull request
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            echo "Triggered by a push event"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "Triggered by a pull request"
+          else
+            echo "Triggered by another event"
+          fi
+
+      - name: Schedule or Manual Trigger
+        run: |
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            echo "This is a scheduled event"
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "This workflow was manually triggered"
+          fi
+
+      - name: Show event details for issues or releases
+        run: |
+          if [ "${{ github.event_name }}" == "issues" ]; then
+            echo "Issue event detected!"
+            echo "Action: ${{ github.event.action }}"
+            echo "Issue Title: ${{ github.event.issue.title }}"
+          elif [ "${{ github.event_name }}" == "release" ]; then
+            echo "Release event detected!"
+            echo "Release Tag: ${{ github.event.release.tag_name }}"
+          fi
