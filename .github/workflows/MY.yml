@@ -27,8 +27,8 @@ jobs:
       with:
         server_address: smtp.gmail.com
         server_port: 587
-        username: ${{ secrets.SMTP_USERNAME }}
-        password: ${{ secrets.SMTP_PASSWORD }}
+        username: ${{ secrets.MKEMAIL_USERNAME }}
+        password: ${{ secrets.MKEMAIL_PASSWORD }}
         subject: "GitHub Actions Workflow Notification"
         body: "The GitHub Actions workflow has been triggered and completed successfully."
         to: hari.narayana.k158@gmail.com
