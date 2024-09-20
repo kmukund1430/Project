@@ -80,12 +80,13 @@ jobs:
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
-         server_address: smtp.gmail.com
-         server_port: 465
-         username: ${{ secrets.EMAIL_USERNAME }}
-         password: ${{ secrets.EMAIL_PASSWORD }}
-         subject: "GitHub Actions Job Success"
-         body: "The job has completed successfully."
-         to: hari.narayan.k158@gmail.com
-         from: ${{ secrets.EMAIL_USERNAME }}  # Specify the sender's email address
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "GitHub Actions Job Success"
+          body: "The job has completed successfully."
+          to: hari.narayan.k158@gmail.com
+          from: ${{ secrets.EMAIL_USERNAME }}  # Add the sender's email here
+          attachments: test.txt
          attachments: test.txt
