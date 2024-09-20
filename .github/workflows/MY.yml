@@ -26,9 +26,6 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install dependencies
-      run: pip install smtplib email
-
     - name: Run echo command
       run: echo "Hello, this is a test run!"
 
