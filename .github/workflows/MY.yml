@@ -76,16 +76,16 @@ jobs:
           fi
 
       # Step 7: Send email on success with test.txt attached
-      - name: Send email on success
-        if: success()  # This ensures the step runs only if the previous steps were successful
-        uses: mikepenz/action-send-mail@v1.1.0
+      - name: Send Email on Success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.your-email-provider.com  # Replace with your SMTP server
+          server_address: smtp.gmail.com
           server_port: 465
-          username: ${{ secrets.EMAIL_USERNAME }}  # Use GitHub Secrets for SMTP username
-          password: ${{ secrets.EMAIL_PASSWORD }}  # Use GitHub Secrets for SMTP password
-          subject: "File test.txt Attached - Successful Workflow Run"
-          body: "The file test.txt has been successfully attached from the main branch."
-          to: hari.narayan.k158@gmail.com
-          from: sender@example.com
-          attachments: test.txt  # Attaching the test.txt file from the repo
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "GitHub Actions Job Success"
+          body: "The job has completed successfully."
+          to: recipient@example.com
+          from: ${{ secrets.EMAIL_USERNAME }}
+          attachments: test.txt
