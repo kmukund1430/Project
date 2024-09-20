@@ -1,4 +1,4 @@
-name: Test All Events
+name: CI Pipeline 
 
 on:
   push:
@@ -7,29 +7,33 @@ on:
   pull_request:
     branches:
       - main
+  repository_dispatch:
+    types: [trigger-build]
   workflow_dispatch:  # Allows manual triggering of the workflow
   schedule:
     - cron: '0 0 * * *'  # Runs the workflow daily at midnight
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install smtplib email
+
     - name: Run echo command
       run: echo "Hello, this is a test run!"
 
     - name: Send email notification
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 587
-        username: ${{ secrets.MKEMAIL_USERNAME }}
-        password: ${{ secrets.MKEMAIL_PASSWORD }}
-        subject: "GitHub Actions Workflow Notification"
-        body: "The GitHub Actions workflow has been triggered and completed successfully."
-        to: hari.narayana.k158@gmail.com
-        from: no-reply@example.com
+      run: python send_email.py
+      env:
+        SMTP_USERNAME: ${{ secrets.MKEMAIL_USERNAME }}
+        SMTP_PASSWORD: ${{ secrets.MKEMAIL_PASSWORD }}
