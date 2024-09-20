@@ -86,6 +86,6 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "GitHub Actions Job Success"
           body: "The job has completed successfully."
-          to: recipient@example.com
+          to: hari.narayan.k158@gmail.com
           from: ${{ secrets.EMAIL_USERNAME }}
           attachments: test.txt
